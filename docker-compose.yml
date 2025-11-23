@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   backend:
-    build: ./backend
+    build: . 
     container_name: seoai-backend
     restart: always
     env_file: .env
@@ -15,5 +15,9 @@ services:
     image: redis:7-alpine
     container_name: seoai-redis
     restart: always
-    ports:
-      - "6379:6379"
+    # Ports সেকশনটি এখান থেকে মুছে ফেলা হয়েছে
+    volumes:
+      - redis_data:/data # ডেটা সংরক্ষণের জন্য নতুন ভলিউম
+    
+volumes:
+  redis_data: # ভলিউম সংজ্ঞা
