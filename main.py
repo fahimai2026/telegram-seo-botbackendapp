@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 # Final Fix: Changed relative/app imports to direct imports for deployment stability.
-# This works best when all modules (webhook_bot, payment, etc.) are in the root directory.
-import webhook_bot
+# webhook_bot মডিউলটি মুছে ফেলা হয়েছে কারণ এটি আর বিদ্যমান নেই।
 import stripe_webhook
 import payment
 import db
@@ -22,7 +21,7 @@ async def startup_event():
     print("✅ Redis Connected")
 
 # Mount routers
-app.include_router(webhook_bot.router, prefix="/webhook/telegram", tags=["telegram"])
+# webhook_bot রাউটারটি মুছে ফেলা হয়েছে
 app.include_router(stripe_webhook.router, prefix="/webhook/stripe", tags=["stripe"])
 app.include_router(payment.router, prefix="/payment", tags=["payment"])
 
