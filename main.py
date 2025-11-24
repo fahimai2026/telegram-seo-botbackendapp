@@ -1,6 +1,5 @@
-# backend/app/main.py
 from fastapi import FastAPI
-from backend.app import webhook_bot, stripe_webhook, payment, db
+from app import webhook_bot, stripe_webhook, payment, db
 import redis
 import os
 
