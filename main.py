@@ -1,6 +1,10 @@
 from fastapi import FastAPI
-# Corrected import path for flat structure (modules in the same directory)
-from . import webhook_bot, stripe_webhook, payment, db
+# Final Fix: Changed relative/app imports to direct imports for deployment stability.
+# This works best when all modules (webhook_bot, payment, etc.) are in the root directory.
+import webhook_bot
+import stripe_webhook
+import payment
+import db
 import redis
 import os
 
@@ -12,6 +16,7 @@ r = redis.from_url(redis_url)
 
 @app.on_event("startup")
 async def startup_event():
+    # Call init_db and check Redis connection during startup
     db.init_db()
     print("✅ Database Initialized")
     print("✅ Redis Connected")
