@@ -25,5 +25,5 @@ Stripe দিয়ে Pro সাবস্ক্রিপশন সাপোর�
 
 ### 1. Clone Repo
 ```bash
-git clone https://github.com/yourusername/telegram-seo-bot.git
-cd telegram-seo-bot
+git clone https://github.com/fahimai2026/telegram-seo-botbackendapp.git
+cd telegram-seo-botbackendapp
