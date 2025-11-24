@@ -1,5 +1,6 @@
 from fastapi import FastAPI
-from app import webhook_bot, stripe_webhook, payment, db
+# Corrected import path for flat structure (modules in the same directory)
+from . import webhook_bot, stripe_webhook, payment, db
 import redis
 import os
 
