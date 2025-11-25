@@ -3,8 +3,7 @@ from fastapi import APIRouter, Request, HTTPException
 import stripe
 import json
 from config import settings
-from db import get_or_create_user, update_subscription
-
+from db import get_user_create_user, update_subscription
 router = APIRouter()
 stripe.api_key = settings.STRIPE_SECRET
 
