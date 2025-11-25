@@ -1,33 +1,24 @@
 import os
-from pydantic_settings import BaseSettings
 
-# BaseSettings class automatically loads environment variables 
-# from the system environment (which Render uses)
-class Settings(BaseSettings):
+class Settings:
     # Telegram
-    TELEGRAM_TOKEN: str
-    TELEGRAM_WEBHOOK_URL: str
+    TELEGRAM_TOKEN: str = os.getenv("TELEGRAM_TOKEN")
+    TELEGRAM_WEBHOOK_URL: str = os.getenv("TELEGRAM_WEBHOOK_URL")
     
     # OpenAI
-    OPENAI_API_KEY: str
-    OPENAI_MODEL: str
+    OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY")
+    OPENAI_MODEL: str = os.getenv("OPENAI_MODEL")
     
     # Stripe
-    STRIPE_SECRET: str
-    STRIPE_PRICE_PRO: str
-    STRIPE_WEBHOOK_SECRET: str
+    STRIPE_SECRET: str = os.getenv("STRIPE_SECRET")
+    STRIPE_PRICE_PRO: str = os.getenv("STRIPE_PRICE_PRO")
+    STRIPE_WEBHOOK_SECRET: str = os.getenv("STRIPE_WEBHOOK_SECRET")
 
     # Database & Cache
-    REDIS_URL: str
-    DB_PATH: str = "seo_bot.db"
+    REDIS_URL: str = os.getenv("REDIS_URL")
+    DB_PATH: str = os.getenv("DB_PATH", "seo_bot.db")
     
     # Limits
-    FREE_LIMIT: int = 5
-    
-    class Config:
-        # Pydantic-Settings-কে বলা হচ্ছে যেন শুধুমাত্র OS Environment থেকে ভ্যালু নেয়
-        # এবং .env ফাইল লোড করার চেষ্টা না করে।
-        env_file = None 
-        env_file_encoding = 'utf-8'
+    FREE_LIMIT: int = int(os.getenv("FREE_LIMIT", 5))
 
 settings = Settings()
