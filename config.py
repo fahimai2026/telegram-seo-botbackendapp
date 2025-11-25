@@ -25,8 +25,9 @@ class Settings(BaseSettings):
     FREE_LIMIT: int = 5
     
     class Config:
-        # Use case-insensitive environment variables (optional)
-        env_file = ".env" 
+        # Pydantic-Settings-কে বলা হচ্ছে যেন শুধুমাত্র OS Environment থেকে ভ্যালু নেয়
+        # এবং .env ফাইল লোড করার চেষ্টা না করে।
+        env_file = None 
         env_file_encoding = 'utf-8'
 
 settings = Settings()
