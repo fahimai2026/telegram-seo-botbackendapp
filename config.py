@@ -1,13 +1,32 @@
 import os
-from dotenv import load_dotenv
+from pydantic_settings import BaseSettings
 
-load_dotenv()
-
-class Settings:
-    # আপনার .env ফাইলে যা যা আছে, সেই নামগুলো এখানে থাকতে হবে
-    BOT_TOKEN = os.getenv("BOT_TOKEN")
-    STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
-    STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
-    # যদি আরও কোনো ভেরিয়েবল থাকে (যেমন DB_URL), তা এখানে যোগ করুন
+# BaseSettings class automatically loads environment variables 
+# from the system environment (which Render uses)
+class Settings(BaseSettings):
+    # Telegram
+    TELEGRAM_TOKEN: str
+    TELEGRAM_WEBHOOK_URL: str
     
+    # OpenAI
+    OPENAI_API_KEY: str
+    OPENAI_MODEL: str
+    
+    # Stripe
+    STRIPE_SECRET: str
+    STRIPE_PRICE_PRO: str
+    STRIPE_WEBHOOK_SECRET: str
+
+    # Database & Cache
+    REDIS_URL: str
+    DB_PATH: str = "seo_bot.db"
+    
+    # Limits
+    FREE_LIMIT: int = 5
+    
+    class Config:
+        # Use case-insensitive environment variables (optional)
+        env_file = ".env" 
+        env_file_encoding = 'utf-8'
+
 settings = Settings()
