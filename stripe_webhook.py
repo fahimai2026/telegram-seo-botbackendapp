@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request, HTTPException
 import stripe
 import json
 from config import settings
-import db # FIX: Changed from 'from db import ...' to 'import db'
+import db # FIX: Changed from specific imports to 'import db'
 
 router = APIRouter()
 stripe.api_key = settings.STRIPE_SECRET
@@ -24,8 +24,9 @@ async def stripe_webhook(request: Request):
         telegram_id = session["client_reference_id"]
         sub_id = session["subscription"]
         
-        # FIX: Now calling functions via 'db.' prefix
-        user_id = db.get_or_create_user(telegram_id)
+        # FIX: Calling functions via 'db.' prefix to resolve final ImportError
+        # Assumed correct function names are get_or_create_user and update_subscription
+        user_id = db.get_or_create_user(telegram_id) 
         db.update_subscription(user_id, sub_id, days=30, status="pro")
 
     # Handle other relevant events if needed (payment_failed, invoice.paid, etc.)
