@@ -4,11 +4,10 @@ from aiogram import Router, F
 from aiogram.types import Message, KeyboardButton, ReplyKeyboardMarkup
 from aiogram.filters import CommandStart
 
-# ১. রাউটার তৈরি (main.py এর সাথে কানেক্ট করার জন্য)
+# ১. রাউটার তৈরি
 router = Router()
 
-# ২. Gemini কনফিগারেশন (Render Environment থেকে Key নেবে)
-# যদি Key না পায়, তবে এরর দেবে না, কিন্তু কাজ করবে না। তাই Render-এ Key থাকা জরুরি।
+# ২. Gemini কনফিগারেশন
 GOOGLE_API_KEY = os.getenv("GEMINI_API_KEY")
 
 if GOOGLE_API_KEY:
@@ -16,10 +15,10 @@ if GOOGLE_API_KEY:
 else:
     print("⚠️ Warning: GEMINI_API_KEY not found in environment variables!")
 
-# মডেল নির্বাচন (gemini-1.5-flash ফ্রি এবং দ্রুততম)
-model = genai.GenerativeModel('gemini-1.5-flash')
+# ৩. মডেল নির্বাচন (gemini-pro সব একাউন্টে কাজ করে)
+model = genai.GenerativeModel('gemini-pro')
 
-# ৩. স্টার্ট (/start) কমান্ডের হ্যান্ডলার
+# ৪. স্টার্ট (/start) কমান্ডের হ্যান্ডলার
 @router.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
     # একটি বাটন তৈরি
@@ -32,7 +31,7 @@ async def command_start_handler(message: Message) -> None:
     
     welcome_msg = (
         f"👋 **স্বাগতম, {message.from_user.first_name}!**\n\n"
-        "আমি Google Gemini ⚡ দ্বারা চালিত আপনার SEO এক্সপার্ট।\n"
+        "আমি Google Gemini দ্বারা চালিত আপনার SEO এক্সপার্ট। ⚡\n"
         "যেকোনো ভিডিওর **টাইটেল (Title)** আমাকে পাঠান, আমি ফ্রিতে সেটির জন্য:\n\n"
         "✅ ৩টি অপ্টিমাইজড টাইটেল\n"
         "✅ এসইও ফ্রেন্ডলি ডেসক্রিপশন\n"
@@ -41,7 +40,7 @@ async def command_start_handler(message: Message) -> None:
     )
     await message.answer(welcome_msg, reply_markup=keyboard)
 
-# ৪. SEO লজিক হ্যান্ডলার (যেকোনো টেক্সট মেসেজ এর জন্য)
+# ৫. SEO লজিক হ্যান্ডলার
 @router.message(F.text)
 async def seo_generation_handler(message: Message) -> None:
     # বাটন চাপলে সাধারণ উত্তর
@@ -82,5 +81,5 @@ async def seo_generation_handler(message: Message) -> None:
 
     except Exception as e:
         # এরর হ্যান্ডলিং
-        error_msg = f"⚠️ দুঃখিত, একটি সমস্যা হয়েছে।\nError: {str(e)}\n\nদয়া করে Render-এ আপনার GEMINI_API_KEY চেক করুন।"
+        error_msg = f"⚠️ দুঃখিত, একটি সমস্যা হয়েছে।\nError: {str(e)}\n\nRender-এ আপনার GEMINI_API_KEY ঠিক আছে কিনা দেখুন।"
         await message.answer(error_msg)
