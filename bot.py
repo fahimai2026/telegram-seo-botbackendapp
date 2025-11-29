@@ -9,13 +9,13 @@ router = Router()
 # API Key পরিবেশ থেকে নেওয়া
 GOOGLE_API_KEY = os.getenv("GEMINI_API_KEY")
 
-# --- ডাইরেক্ট API কল ফাংশন (gemini-pro) ---
+# --- ডাইরেক্ট API কল ফাংশন (gemini-1.5-flash) ---
 async def call_gemini_api(prompt):
     if not GOOGLE_API_KEY:
         return "⚠️ API Key পাওয়া যায়নি! Render-এ চেক করুন।"
 
-    # এখানে মডেল নাম পরিবর্তন করে 'gemini-pro' করা হয়েছে
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={GOOGLE_API_KEY}"
+    # সরাসরি Google-এর লিংকে হিট করা হচ্ছে (লাইব্রেরি ছাড়া)
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GOOGLE_API_KEY}"
     
     payload = {
         "contents": [{
@@ -45,7 +45,7 @@ async def command_start_handler(message: Message) -> None:
     )
     welcome_msg = (
         f"👋 **স্বাগতম, {message.from_user.first_name}!**\n\n"
-        "আমি Google Gemini (Pro) ⚡ দ্বারা চালিত আপনার SEO এক্সপার্ট।\n"
+        "আমি Google Gemini (Flash) ⚡ দ্বারা চালিত আপনার SEO এক্সপার্ট।\n"
         "যেকোনো ভিডিওর **টাইটেল** পাঠান, আমি দিচ্ছি:\n"
         "✅ ৩টি অপ্টিমাইজড টাইটেল\n✅ এসইও ডেসক্রিপশন\n✅ ভাইরাল ট্যাগ"
     )
