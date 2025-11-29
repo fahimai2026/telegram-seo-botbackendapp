@@ -1,19 +1,41 @@
 import os
-import google.generativeai as genai
+import aiohttp
 from aiogram import Router, F
 from aiogram.types import Message, KeyboardButton, ReplyKeyboardMarkup
 from aiogram.filters import CommandStart
 
 router = Router()
 
-# API Key সেটআপ
+# API Key পরিবেশ থেকে নেওয়া
 GOOGLE_API_KEY = os.getenv("GEMINI_API_KEY")
 
-if GOOGLE_API_KEY:
-    genai.configure(api_key=GOOGLE_API_KEY)
+# --- ডাইরেক্ট API কল ফাংশন (লাইব্রেরি ছাড়া) ---
+async def call_gemini_api(prompt):
+    if not GOOGLE_API_KEY:
+        return "⚠️ API Key পাওয়া যায়নি! Render-এ চেক করুন।"
 
-# লেটেস্ট এবং ফাস্ট মডেল
-model = genai.GenerativeModel('gemini-1.5-flash')
+    # সরাসরি Google এর লিংকে হিট করা হচ্ছে
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GOOGLE_API_KEY}"
+    
+    payload = {
+        "contents": [{
+            "parts": [{"text": prompt}]
+        }]
+    }
+    
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url, json=payload) as response:
+            if response.status == 200:
+                data = await response.json()
+                try:
+                    return data['candidates'][0]['content']['parts'][0]['text']
+                except (KeyError, IndexError):
+                    return "⚠️ উত্তর সাজাতে সমস্যা হয়েছে। আবার চেষ্টা করুন।"
+            else:
+                error_text = await response.text()
+                return f"⚠️ Google Error ({response.status}): {error_text}"
+
+# -------------------------------------------
 
 @router.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
@@ -23,7 +45,7 @@ async def command_start_handler(message: Message) -> None:
     )
     welcome_msg = (
         f"👋 **স্বাগতম, {message.from_user.first_name}!**\n\n"
-        "আমি Google Gemini (Flash) ⚡ দ্বারা চালিত আপনার SEO এক্সপার্ট।\n"
+        "আমি Google Gemini (Direct) ⚡ দ্বারা চালিত আপনার SEO এক্সপার্ট।\n"
         "যেকোনো ভিডিওর **টাইটেল** পাঠান, আমি দিচ্ছি:\n"
         "✅ ৩টি অপ্টিমাইজড টাইটেল\n✅ এসইও ডেসক্রিপশন\n✅ ভাইরাল ট্যাগ"
     )
@@ -35,20 +57,16 @@ async def seo_generation_handler(message: Message) -> None:
         await message.answer("যেকোনো ভিডিওর টাইটেল লিখে পাঠান।")
         return
 
-    wait_msg = await message.answer("⚡ Gemini চিন্তা করছে... একটু সময় দিন।")
+    wait_msg = await message.answer("⚡ Gemini চিন্তা করছে... (Direct Mode)")
     
+    # প্রম্পট তৈরি
+    prompt = f"Act as a YouTube SEO Expert. Optimize title: '{message.text}'. Give 3 Titles, Description, and 15 Hashtags."
+    
+    # ফাংশন কল করা
     try:
-        prompt = f"Act as a YouTube SEO Expert. Optimize title: '{message.text}'. Give 3 Titles, Description, and 15 Hashtags."
-        
-        # জেনারেট করা হচ্ছে
-        response = await model.generate_content_async(prompt)
-        
-        if response.text:
-            await message.answer(f"✅ **রেজাল্ট:**\n\n{response.text}")
-        else:
-            await message.answer("⚠️ উত্তর আসতে সমস্যা হয়েছে। আবার চেষ্টা করুন।")
-            
-        await wait_msg.delete()
-
+        result = await call_gemini_api(prompt)
+        await message.answer(f"✅ **রেজাল্ট:**\n\n{result}")
     except Exception as e:
-        await message.answer(f"⚠️ **সমস্যা হয়েছে:**\n{str(e)}\n\n(API Key টি Render-এ চেক করুন)")
+        await message.answer(f"⚠️ **বট এরর:** {str(e)}")
+    
+    await wait_msg.delete()
